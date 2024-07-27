@@ -16,6 +16,8 @@ contract MinimalAccount is IAccount, Ownable {
                                  ERRORS
     //////////////////////////////////////////////////////////////*/
     error MinimalAccount__OnlyEntryPoint();
+    error MinimalAccount__OnlyEntryPointOrOwner();
+    error MinimalAccount__CallFailed(bytes result);
 
     /*//////////////////////////////////////////////////////////////
                                VARIABLES
@@ -30,6 +32,13 @@ contract MinimalAccount is IAccount, Ownable {
         _;
     }
 
+    modifier onlyEntryPointOrOwner() {
+        if (msg.sender != address(i_entryPoint) && msg.sender != owner()) {
+            revert MinimalAccount__OnlyEntryPointOrOwner();
+        }
+        _;
+    }
+
     /*//////////////////////////////////////////////////////////////
                               CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
@@ -37,9 +46,16 @@ contract MinimalAccount is IAccount, Ownable {
         i_entryPoint = IEntryPoint(entryPoint);
     }
 
+    receive() external payable {}
+
     /*//////////////////////////////////////////////////////////////
                            EXTERNAL FUNCTIONS
     //////////////////////////////////////////////////////////////*/
+    function execute(address _dest, uint256 _value, bytes calldata _functionData) external onlyEntryPointOrOwner {
+        (bool success, bytes memory result) = _dest.call{value: _value}(_functionData);
+        if (!success) revert MinimalAccount__CallFailed(result);
+    }
+
     // A signature is valid, if it's the contract owner
     function validateUserOp(PackedUserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
         external
