@@ -8,11 +8,34 @@ import {IAccount, PackedUserOperation} from "lib/account-abstraction/contracts/i
 import {HelperConfig} from "../script/HelperConfig.s.sol";
 import {IEntryPoint} from "lib/account-abstraction/contracts/interfaces/IEntryPoint.sol";
 import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+/// forge script script/SendPackedUserOp.s.sol --rpc-url $RPC_URL --account customFoundryAccountName --broadcast -vvv
 contract SendPackedUserOp is Script {
     using MessageHashUtils for bytes32;
 
-    function run() public {}
+    /// @dev this is a place holder for our deployed MinimalAccount
+    address constant MINIMAL_ACCOUNT = address(1);
+    /// @dev this is a place holder for USDC
+    address constant USDC = address(2);
+
+    function run() public {
+        HelperConfig helperConfig = new HelperConfig();
+        address dest = USDC;
+        uint256 value = 0;
+        address receiver = makeAddr("receiver");
+        uint256 amountToApprove = 1e6; // 1 USDC
+        bytes memory functionData = abi.encodeWithSelector(IERC20.approve.selector, receiver, amountToApprove);
+        bytes memory executeCallData =
+            abi.encodeWithSelector(MinimalAccount.execute.selector, dest, value, functionData);
+        PackedUserOperation memory userOp =
+            generateSignedUserOperation(executeCallData, helperConfig.getConfig(), MINIMAL_ACCOUNT);
+        PackedUserOperation[] memory ops = new PackedUserOperation[](1);
+        ops[0] = userOp;
+
+        vm.startBroadcast();
+        IEntryPoint(helperConfig.getConfig().entryPoint).handleOps(ops, payable(helperConfig.getConfig().account));
+    }
 
     function generateSignedUserOperation(
         bytes memory _callData,
