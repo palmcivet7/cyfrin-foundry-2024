@@ -2,5 +2,10 @@
 src = "src"
 out = "out"
 libs = ["lib"]
+remappings = [
+    "@uniswap/v2-core/contracts=lib/uniswap-v2-core/contracts",
+    "@uniswap/v2-periphery/contracts=lib/uniswap-v2-periphery/contracts",
+    "@openzeppelin=lib/openzeppelin-contracts",
+]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

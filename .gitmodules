@@ -19,3 +19,12 @@
 [submodule "account-abstraction/lib/openzeppelin-contracts"]
 	path = account-abstraction/lib/openzeppelin-contracts
 	url = https://github.com/openzeppelin/openzeppelin-contracts
+[submodule "uniswap-v2/lib/uniswap-v2-core"]
+	path = uniswap-v2/lib/uniswap-v2-core
+	url = https://github.com/uniswap/uniswap-v2-core
+[submodule "uniswap-v2/lib/uniswap-v2-periphery"]
+	path = uniswap-v2/lib/uniswap-v2-periphery
+	url = https://github.com/uniswap/uniswap-v2-periphery
+[submodule "uniswap-v2/lib/openzeppelin-contracts"]
+	path = uniswap-v2/lib/openzeppelin-contracts
+	url = https://github.com/openzeppelin/openzeppelin-contracts
